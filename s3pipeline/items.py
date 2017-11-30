@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import scrapy
 
 
@@ -20,3 +22,11 @@ class Page(scrapy.Item):
             p['body'] = p['body'][:100] + '...' + p['body'][-100:]
 
         return super(Page, p).__repr__()  # Return representation of duplicated page
+
+    @classmethod
+    def from_response(cls, response):
+        item = cls()
+        item['url'] = response.url
+        item['body'] = response.text
+        item['crawled_at'] = datetime.now()
+        return item
