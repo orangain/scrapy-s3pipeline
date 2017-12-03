@@ -27,7 +27,7 @@ class S3Pipeline:
         self.object_key_template = o.path[1:]  # Remove the first '/'
 
         self.max_chunk_size = settings.getint('S3PIPELINE_MAX_CHUNK_SIZE', 500)
-        self.use_gzip = settings.getbool('S3PIPELINE_GZIP', True)
+        self.use_gzip = settings.getbool('S3PIPELINE_GZIP', url.endswith('.gz'))
 
         self.s3 = boto3.client('s3')
         self.items = []
