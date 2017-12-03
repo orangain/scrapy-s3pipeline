@@ -12,4 +12,6 @@ setup(name='scrapy-s3pipeline',
           'Scrapy>=1.1',
           'boto3',
       ],
+      test_suite='nose.collector',
+      tests_require=['nose'],
       zip_safe=False)
