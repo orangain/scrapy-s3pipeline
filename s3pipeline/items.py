@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import scrapy
 
@@ -28,5 +28,5 @@ class Page(scrapy.Item):
         item = cls()
         item['url'] = response.url
         item['body'] = response.text
-        item['crawled_at'] = datetime.now()
+        item['crawled_at'] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
         return item

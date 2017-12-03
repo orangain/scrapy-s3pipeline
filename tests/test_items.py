@@ -1,5 +1,5 @@
 from unittest import TestCase
-from datetime import datetime
+from datetime import datetime, timezone
 
 from scrapy.http.response.html import HtmlResponse
 
@@ -14,7 +14,7 @@ class TestItems(TestCase):
         item = Page()
         item['url'] = 'http://example.com'
         item['body'] = EXAMPLE_HTML
-        item['crawled_at'] = datetime.now()
+        item['crawled_at'] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
         self.assertTrue(len(repr(item)) < len(item['body']), 'repr(item) is ommited')
 
@@ -28,4 +28,4 @@ class TestItems(TestCase):
 
         self.assertEqual(item['url'], 'http://example.com')
         self.assertEqual(item['body'], EXAMPLE_HTML)
-        self.assertIsInstance(item['crawled_at'], datetime)
+        self.assertIsInstance(item['crawled_at'], str)
