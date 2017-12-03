@@ -8,4 +8,8 @@ setup(name='scrapy-s3pipeline',
       author_email='orangain@gmail.com',
       license='MIT',
       packages=['s3pipeline'],
+      install_requires=[
+          'Scrapy>=1.1',
+          'boto3',
+      ],
       zip_safe=False)
