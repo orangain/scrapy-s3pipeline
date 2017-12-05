@@ -38,7 +38,7 @@ $ pip3 install scrapy-s3pipeline
 3. Add `S3PIPELINE_URL` setting. You need to change `my-bucket` to your bucket name.
 
     ```py
-    S3PIPELINE_URL = 's3://my-bucket/{name}/items.{chunk:07d}.jl.gz'
+    S3PIPELINE_URL = 's3://my-bucket/{name}/{time}/items.{chunk:07d}.jl.gz'
     ```
 
 4. Run your spider. You will see items in your bucket after 100 items are crawled or the spider is closed.
@@ -49,7 +49,7 @@ $ pip3 install scrapy-s3pipeline
 
 S3 Bucket URL to store items.
 
-e.g.: `s3://my-bucket/{name}/items.{chunk:07d}.jl.gz`
+e.g.: `s3://my-bucket/{name}/{time}/items.{chunk:07d}.jl.gz`
 
 The following replacement fields are supported in `S3PIPELINE_URL`.
 
