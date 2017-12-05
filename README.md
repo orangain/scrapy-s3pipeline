@@ -79,7 +79,7 @@ This make it easy to store entire HTTP body and run scraper in other process. It
 Example usage of Page:
 
 ```py
-from datetime import datetime
+from datetime import datetime, timezone
 
 import scrapy
 from s3pipeline import Page
@@ -98,7 +98,7 @@ class YourSpider(scrapy.Spider):
         item = Page()
         item['url'] = response.url
         item['body'] = response.text
-        item['crawled_at'] = datetime.now()
+        item['crawled_at'] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
         yield item
 ```
 
