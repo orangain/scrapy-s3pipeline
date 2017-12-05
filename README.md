@@ -41,7 +41,7 @@ $ pip3 install scrapy-s3pipeline
     S3PIPELINE_URL = 's3://my-bucket/{name}/items.{chunk:07d}.jl.gz'
     ```
 
-4. Run your spider. You will see items in your bucket after 500 items are crawled or the spider is closed.
+4. Run your spider. You will see items in your bucket after 100 items are crawled or the spider is closed.
 
 ## Settings
 
@@ -53,14 +53,14 @@ e.g.: `s3://my-bucket/{name}/items.{chunk:07d}.jl.gz`
 
 The following replacement fields are supported in `S3PIPELINE_URL`.
 
-* `{chunk}` - gets replaced by a start index of items in current chunk, e.g. '0', '500', '1000',....
+* `{chunk}` - gets replaced by a start index of items in current chunk, e.g. '0', '100', '200',....
 * `{time}` - gets replaced by a timestamp when the spider is started.
 
 You can also use other spider fields, e.g. `{name}`. You can use [format string syntax](https://docs.python.org/3/library/string.html#formatstrings) here, e.g. `{chunk:07d}`.
 
 ### S3PIPELINE_MAX_CHUNK_SIZE (Optional)
 
-Default: `500`
+Default: `100`
 
 Max count of items in a single chunk.
 

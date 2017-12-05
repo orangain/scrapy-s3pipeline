@@ -15,5 +15,5 @@ class TestPipelines(TestCase):
         pipeline = S3Pipeline(self.settings, None)
         self.assertEqual(pipeline.bucket_name, 'my-bucket')
         self.assertEqual(pipeline.object_key_template, '{name}/items.{chunk:07d}.jl.gz')
-        self.assertEqual(pipeline.max_chunk_size, 500)
+        self.assertEqual(pipeline.max_chunk_size, 100)
         self.assertTrue(pipeline.use_gzip)
