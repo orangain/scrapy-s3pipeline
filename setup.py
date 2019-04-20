@@ -1,8 +1,14 @@
 from setuptools import setup
+from pathlib import Path
+
+readme_path = Path(__file__).absolute().parent.joinpath('README.md')
+long_description = readme_path.read_text(encoding='utf-8')
 
 setup(name='scrapy-s3pipeline',
       version='0.2.0',
       description='Scrapy pipeline to store chunked items into AWS S3 bucket',
+      long_description=long_description,
+      long_description_content_type='text/markdown',
       classifiers=[
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: MIT License',
