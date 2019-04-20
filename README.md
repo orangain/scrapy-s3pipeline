@@ -1,5 +1,7 @@
 # Scrapy S3 Pipeline
 
+[![PyPI version](https://badge.fury.io/py/scrapy-s3pipeline.svg)](https://badge.fury.io/py/scrapy-s3pipeline)
+
 Scrapy pipeline to store items into S3 bucket with JSONLines format. Unlike FeedExporter, the pipeline has the following features:
 
 * The pipeline upload items to S3 by chunk while crawler is running.
