@@ -2,7 +2,7 @@
 
 [![PyPI version](https://badge.fury.io/py/scrapy-s3pipeline.svg)](https://badge.fury.io/py/scrapy-s3pipeline)
 
-Scrapy pipeline to store items into S3 bucket with JSONLines format. Unlike FeedExporter, the pipeline has the following features:
+Scrapy pipeline to store items into S3 bucket with JSONLines format. Unlike built-in [FeedExporter](https://docs.scrapy.org/en/latest/topics/feed-exports.html#s3), the pipeline has the following features:
 
 * The pipeline upload items to S3 by chunk while crawler is running.
 * Support GZip compression.
@@ -11,8 +11,8 @@ The pipeline aims to run crawler and scraper in different processes, e.g. run cr
 
 ## Requirements
 
-* Python 3.4+ (Tested in 3.6)
-* Scrapy 1.1+ (Tested in 1.4)
+* Python 3.4+ (Tested in 3.7)
+* Scrapy 1.1+ (Tested in 1.6)
 * boto3
 
 ## Install
@@ -43,7 +43,9 @@ $ pip3 install scrapy-s3pipeline
     S3PIPELINE_URL = 's3://my-bucket/{name}/{time}/items.{chunk:07d}.jl.gz'
     ```
 
-4. Run your spider. You will see items in your bucket after 100 items are crawled or the spider is closed.
+4. Setup AWS credentials via AWS CLI's `aws configure` command. Alternatively, use Scrapy's `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` settings.
+
+5. Run your spider. You will see items in your bucket after 100 items are crawled or the spider is closed.
 
 ## Settings
 
@@ -70,7 +72,7 @@ Max count of items in a single chunk.
 
 Default: `True` if `S3PIPELINE_URL` ends with `.gz`; otherwise `False`.
 
-If `True`, compress uploaded file with Gzip.
+If `True`, uploaded files will be compressed with Gzip.
 
 ## Page item
 
