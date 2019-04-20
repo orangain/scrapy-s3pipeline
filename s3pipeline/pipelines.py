@@ -29,7 +29,12 @@ class S3Pipeline:
         self.max_chunk_size = settings.getint('S3PIPELINE_MAX_CHUNK_SIZE', 100)
         self.use_gzip = settings.getbool('S3PIPELINE_GZIP', url.endswith('.gz'))
 
-        self.s3 = boto3.client('s3')
+        self.s3 = boto3.client(
+            's3',
+            region_name=settings['AWS_REGION_NAME'], use_ssl=settings['AWS_USE_SSL'],
+            verify=settings['AWS_VERIFY'], endpoint_url=settings['AWS_ENDPOINT_URL'],
+            aws_access_key_id=settings['AWS_ACCESS_KEY_ID'],
+            aws_secret_access_key=settings['AWS_SECRET_ACCESS_KEY'])
         self.items = []
         self.chunk_number = 0
 
