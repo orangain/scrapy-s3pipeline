@@ -68,6 +68,12 @@ Default: `100`
 
 Max count of items in a single chunk.
 
+### S3PIPELINE_PROCESS_ITEM_TIMEOUT (Optional)
+
+Default: `30.0`
+
+When no new item is processed in more than `S3PIPELINE_PROCESS_ITEM_TIMEOUT` seconds, it will be forced to upload a chunk.
+
 ### S3PIPELINE_GZIP (Optional)
 
 Default: `True` if `S3PIPELINE_URL` ends with `.gz`; otherwise `False`.
