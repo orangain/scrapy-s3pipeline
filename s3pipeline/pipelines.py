@@ -49,10 +49,13 @@ class S3Pipeline:
         Process single item. Add item to items and then upload to S3 if size of items
         >= max_chunk_size.
         """
+        self._timer_cancel()
+
         self.items.append(item)
         if len(self.items) >= self.max_chunk_size:
             self._upload_chunk()
 
+        self._timer_start()
         return item
 
     def open_spider(self, spider):
@@ -77,8 +80,8 @@ class S3Pipeline:
         """
         Do upload items to S3.
         """
-        if self._timer is not None:
-            self._timer.cancel()
+        self._timer_cancel()
+        
         if not self.items:
             return  # Do nothing when items is empty.
 
@@ -98,8 +101,8 @@ class S3Pipeline:
             # Prepare for the next chunk
             self.chunk_number += len(self.items)
             self.items = []
-            self._timer = self._get_timer()
-            self._timer.start()
+
+            self._timer_start()
 
     def _get_uri_params(self):
         params = {}
@@ -133,5 +136,16 @@ class S3Pipeline:
 
         return bio
     
-    def _get_timer(self):
-        return Timer(self.process_item_timeout, self._upload_chunk)
+    def _timer_start(self):
+        """
+        Start the timer in s3pipeline
+        """
+        self._timer = Timer(self.process_item_timeout, self._upload_chunk)
+        self._timer.start()
+    
+    def _timer_cancel(self):
+        """
+        Stop the timer in s3pipeline
+        """
+        if self._timer is not None:
+            self._timer.cancel()
