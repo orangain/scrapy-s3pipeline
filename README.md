@@ -68,11 +68,11 @@ Default: `100`
 
 Max count of items in a single chunk.
 
-### S3PIPELINE_PROCESS_ITEM_TIMEOUT (Optional)
+### S3PIPELINE_MAX_WAIT_UPLOAD_TIME (Optional)
 
 Default: `30.0`
 
-When no new item is processed in more than `S3PIPELINE_PROCESS_ITEM_TIMEOUT` seconds, it will be forced to upload a chunk.
+When no new item is processed in more than `S3PIPELINE_MAX_WAIT_UPLOAD_TIME` seconds, it will be forced to upload a chunk.
 
 ### S3PIPELINE_GZIP (Optional)
 

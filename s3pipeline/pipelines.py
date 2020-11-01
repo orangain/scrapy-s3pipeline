@@ -29,7 +29,7 @@ class S3Pipeline:
 
         self.max_chunk_size = settings.getint('S3PIPELINE_MAX_CHUNK_SIZE', 100)
         self.use_gzip = settings.getbool('S3PIPELINE_GZIP', url.endswith('.gz'))
-        self.process_item_timeout = settings.getfloat('S3PIPELINE_PROCESS_ITEM_TIMEOUT', 30.0)
+        self.max_wait_upload_time = settings.getfloat('S3PIPELINE_MAX_WAIT_UPLOAD_TIME', 300.0)
 
         self.s3 = boto3.client(
             's3',
@@ -49,13 +49,10 @@ class S3Pipeline:
         Process single item. Add item to items and then upload to S3 if size of items
         >= max_chunk_size.
         """
-        self._timer_cancel()
-
         self.items.append(item)
         if len(self.items) >= self.max_chunk_size:
             self._upload_chunk()
 
-        self._timer_start()
         return item
 
     def open_spider(self, spider):
@@ -66,6 +63,7 @@ class S3Pipeline:
         self.ts = datetime.utcnow().replace(microsecond=0).isoformat().replace(':', '-')
         self._spider = spider
         self._timer = None
+        self._upload_chunk()
 
     def close_spider(self, spider):
         """
@@ -73,8 +71,7 @@ class S3Pipeline:
         """
         # Upload remained items to S3.
         self._upload_chunk()
-        if self._timer is not None:
-            self._timer.cancel()
+        self._timer.cancel()
 
     def _upload_chunk(self):
         """
@@ -140,7 +137,7 @@ class S3Pipeline:
         """
         Start the timer in s3pipeline
         """
-        self._timer = Timer(self.process_item_timeout, self._upload_chunk)
+        self._timer = Timer(self.max_wait_upload_time, self._upload_chunk)
         self._timer.start()
     
     def _timer_cancel(self):
