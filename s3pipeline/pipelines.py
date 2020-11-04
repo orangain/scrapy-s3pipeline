@@ -29,7 +29,7 @@ class S3Pipeline:
 
         self.max_chunk_size = settings.getint('S3PIPELINE_MAX_CHUNK_SIZE', 100)
         self.use_gzip = settings.getbool('S3PIPELINE_GZIP', url.endswith('.gz'))
-        self.max_wait_upload_time = settings.getfloat('S3PIPELINE_MAX_WAIT_UPLOAD_TIME', 300.0)
+        self.max_wait_upload_time = settings.getfloat('S3PIPELINE_MAX_WAIT_UPLOAD_TIME', 30.0)
 
         self.s3 = boto3.client(
             's3',
@@ -49,9 +49,13 @@ class S3Pipeline:
         Process single item. Add item to items and then upload to S3 if size of items
         >= max_chunk_size.
         """
+        self._timer_cancel()
+
         self.items.append(item)
         if len(self.items) >= self.max_chunk_size:
             self._upload_chunk()
+
+        self._timer_start()
 
         return item
 
@@ -63,7 +67,6 @@ class S3Pipeline:
         self.ts = datetime.utcnow().replace(microsecond=0).isoformat().replace(':', '-')
         self._spider = spider
         self._timer = None
-        self._upload_chunk()
 
     def close_spider(self, spider):
         """
@@ -77,7 +80,6 @@ class S3Pipeline:
         """
         Do upload items to S3.
         """
-        self._timer_cancel()
         
         if not self.items:
             return  # Do nothing when items is empty.
@@ -98,8 +100,6 @@ class S3Pipeline:
             # Prepare for the next chunk
             self.chunk_number += len(self.items)
             self.items = []
-
-            self._timer_start()
 
     def _get_uri_params(self):
         params = {}
