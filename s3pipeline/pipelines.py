@@ -74,7 +74,7 @@ class S3Pipeline:
         """
         # Upload remained items to S3.
         self._upload_chunk()
-        self._timer.cancel()
+        self._timer_cancel()
 
     def _upload_chunk(self):
         """
