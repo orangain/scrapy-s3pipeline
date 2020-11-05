@@ -2,6 +2,7 @@ from io import BytesIO
 from urllib.parse import urlparse
 from datetime import datetime
 import gzip
+from threading import Timer
 
 import boto3
 from botocore.exceptions import ClientError
@@ -28,6 +29,7 @@ class S3Pipeline:
 
         self.max_chunk_size = settings.getint('S3PIPELINE_MAX_CHUNK_SIZE', 100)
         self.use_gzip = settings.getbool('S3PIPELINE_GZIP', url.endswith('.gz'))
+        self.max_wait_upload_time = settings.getfloat('S3PIPELINE_MAX_WAIT_UPLOAD_TIME', 30.0)
 
         self.s3 = boto3.client(
             's3',
@@ -47,9 +49,13 @@ class S3Pipeline:
         Process single item. Add item to items and then upload to S3 if size of items
         >= max_chunk_size.
         """
+        self._timer_cancel()
+
         self.items.append(item)
         if len(self.items) >= self.max_chunk_size:
-            self._upload_chunk(spider)
+            self._upload_chunk()
+
+        self._timer_start()
 
         return item
 
@@ -59,26 +65,29 @@ class S3Pipeline:
         """
         # Store timestamp to replace {time} in S3PIPELINE_URL
         self.ts = datetime.utcnow().replace(microsecond=0).isoformat().replace(':', '-')
+        self._spider = spider
+        self._timer = None
 
     def close_spider(self, spider):
         """
         Callback function when spider is closed.
         """
         # Upload remained items to S3.
-        self._upload_chunk(spider)
+        self._upload_chunk()
+        self._timer_cancel()
 
-    def _upload_chunk(self, spider):
+    def _upload_chunk(self):
         """
         Do upload items to S3.
         """
-
+        
         if not self.items:
             return  # Do nothing when items is empty.
 
         f = self._make_fileobj()
 
         # Build object key by replacing variables in object key template.
-        object_key = self.object_key_template.format(**self._get_uri_params(spider))
+        object_key = self.object_key_template.format(**self._get_uri_params())
 
         try:
             self.s3.upload_fileobj(f, self.bucket_name, object_key)
@@ -92,10 +101,10 @@ class S3Pipeline:
             self.chunk_number += len(self.items)
             self.items = []
 
-    def _get_uri_params(self, spider):
+    def _get_uri_params(self):
         params = {}
-        for key in dir(spider):
-            params[key] = getattr(spider, key)
+        for key in dir(self._spider):
+            params[key] = getattr(self._spider, key)
 
         params['chunk'] = self.chunk_number
         params['time'] = self.ts
@@ -123,3 +132,17 @@ class S3Pipeline:
         bio.seek(0)
 
         return bio
+    
+    def _timer_start(self):
+        """
+        Start the timer in s3pipeline
+        """
+        self._timer = Timer(self.max_wait_upload_time, self._upload_chunk)
+        self._timer.start()
+    
+    def _timer_cancel(self):
+        """
+        Stop the timer in s3pipeline
+        """
+        if self._timer is not None:
+            self._timer.cancel()
