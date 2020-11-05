@@ -11,8 +11,8 @@ The pipeline aims to run crawler and scraper in different processes, e.g. run cr
 
 ## Requirements
 
-* Python 3.4+ (Tested in 3.7)
-* Scrapy 1.1+ (Tested in 1.6)
+* Python 3.6+ (Tested in 3.9)
+* Scrapy 1.1+ (Tested in 2.4)
 * boto3
 
 ## Install
