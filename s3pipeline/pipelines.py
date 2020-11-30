@@ -119,7 +119,7 @@ class S3Pipeline:
         f = gzip.GzipFile(mode='wb', fileobj=bio) if self.use_gzip else bio
 
         # Build file object using ItemExporter
-        exporter = JsonLinesItemExporter(f)
+        exporter = JsonLinesItemExporter(f, encoding='utf-8')
         exporter.start_exporting()
         for item in self.items:
             exporter.export_item(item)
