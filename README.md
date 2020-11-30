@@ -80,19 +80,6 @@ Default: `True` if `S3PIPELINE_URL` ends with `.gz`; otherwise `False`.
 
 If `True`, uploaded files will be compressed with Gzip.
 
-### S3PIPELINE_ITEM_EXPORTER_ARGS (Optional)
-
-Default: `{}` 
-
-This is the second parameter value of the `JsonLinesItemExporter` constructor.
-
-e.g.:
-```py
-S3PIPELINE_ITEM_EXPORTER_ARGS = {
-  'encoding': 'utf-8'
-}
-```
-
 ## Page item
 
 For convinience, Scrapy S3 Pipeline provides `s3pipeline.Page` item class to store entire HTTP body. It has `url`, `body` and `crawled_at` fields.

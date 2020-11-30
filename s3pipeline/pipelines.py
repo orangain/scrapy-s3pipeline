@@ -30,7 +30,6 @@ class S3Pipeline:
         self.max_chunk_size = settings.getint('S3PIPELINE_MAX_CHUNK_SIZE', 100)
         self.use_gzip = settings.getbool('S3PIPELINE_GZIP', url.endswith('.gz'))
         self.max_wait_upload_time = settings.getfloat('S3PIPELINE_MAX_WAIT_UPLOAD_TIME', 30.0)
-        self.item_exporter_args = settings.get('S3PIPELINE_ITEM_EXPORTER_ARGS', {})
 
         self.s3 = boto3.client(
             's3',
@@ -120,7 +119,7 @@ class S3Pipeline:
         f = gzip.GzipFile(mode='wb', fileobj=bio) if self.use_gzip else bio
 
         # Build file object using ItemExporter
-        exporter = JsonLinesItemExporter(f, **self.item_exporter_args)
+        exporter = JsonLinesItemExporter(f, encoding='utf-8')
         exporter.start_exporting()
         for item in self.items:
             exporter.export_item(item)
