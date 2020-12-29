@@ -32,8 +32,11 @@ class S3Pipeline:
         if o.scheme == 's3':
             from .strategies.s3 import S3Strategy
             self.strategy = S3Strategy(settings)
+        elif o.scheme == 'gs':
+            from .strategies.gcs import GCSStrategy
+            self.strategy = GCSStrategy(settings)
         else:
-            raise ValueError('S3PIPELINE_URL must start with s3://')
+            raise ValueError('S3PIPELINE_URL must start with s3:// or gs://')
 
         self.items = []
         self.chunk_number = 0
