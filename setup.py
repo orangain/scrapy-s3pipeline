@@ -25,10 +25,11 @@ setup(name='scrapy-s3pipeline',
       author_email='orangain@gmail.com',
       license='MIT',
       packages=['s3pipeline'],
-      install_requires=[
-          'Scrapy>=1.1',
-          'boto3',
-      ],
+      install_requires=['Scrapy>=1.1'],
+      extras_require={
+          's3': ['boto3'],
+          'gcs': ['google-cloud-storage'],
+      },
       test_suite='nose.collector',
       tests_require=['nose'],
       zip_safe=False)
