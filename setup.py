@@ -24,7 +24,10 @@ setup(name='scrapy-s3pipeline',
       author='orangain',
       author_email='orangain@gmail.com',
       license='MIT',
-      packages=['s3pipeline'],
+      packages=[
+          's3pipeline',
+          's3pipeline.strategies',
+      ],
       install_requires=['Scrapy>=1.1'],
       extras_require={
           's3': ['boto3'],
