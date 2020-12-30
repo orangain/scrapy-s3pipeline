@@ -4,7 +4,7 @@ from google.cloud import storage
 from google.cloud.exceptions import GoogleCloudError
 from google.oauth2 import service_account
 
-from . import UploadError
+from s3pipeline.strategies.error import UploadError
 
 class GCSStrategy:
     def __init__(self, settings):

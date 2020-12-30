@@ -6,7 +6,7 @@ from threading import Timer
 
 from scrapy.exporters import JsonLinesItemExporter
 
-from .strategies import UploadError
+from s3pipeline.strategies.error import UploadError
 
 class S3Pipeline:
     """

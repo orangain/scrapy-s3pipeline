@@ -1,7 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
 
-from . import UploadError
+from s3pipeline.strategies.error import UploadError
 
 class S3Strategy:
     def __init__(self, settings):
