@@ -47,8 +47,8 @@ class S3Pipeline:
 
     def process_item(self, item, spider):
         """
-        Process single item. Add item to items and then upload to S3 if size of items
-        >= max_chunk_size.
+        Process single item. Add item to items and then upload to S3/GCS
+        if size of items >= max_chunk_size.
         """
         self._timer_cancel()
 
@@ -79,7 +79,7 @@ class S3Pipeline:
 
     def _upload_chunk(self):
         """
-        Do upload items to S3.
+        Do upload items to S3/GCS.
         """
 
         if not self.items:
