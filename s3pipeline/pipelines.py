@@ -4,11 +4,9 @@ from datetime import datetime
 import gzip
 from threading import Timer
 
-import boto3
-from botocore.exceptions import ClientError
-
 from scrapy.exporters import JsonLinesItemExporter
 
+from s3pipeline.strategies.error import UploadError
 
 class S3Pipeline:
     """
@@ -31,12 +29,15 @@ class S3Pipeline:
         self.use_gzip = settings.getbool('S3PIPELINE_GZIP', url.endswith('.gz'))
         self.max_wait_upload_time = settings.getfloat('S3PIPELINE_MAX_WAIT_UPLOAD_TIME', 30.0)
 
-        self.s3 = boto3.client(
-            's3',
-            region_name=settings['AWS_REGION_NAME'], use_ssl=settings['AWS_USE_SSL'],
-            verify=settings['AWS_VERIFY'], endpoint_url=settings['AWS_ENDPOINT_URL'],
-            aws_access_key_id=settings['AWS_ACCESS_KEY_ID'],
-            aws_secret_access_key=settings['AWS_SECRET_ACCESS_KEY'])
+        if o.scheme == 's3':
+            from .strategies.s3 import S3Strategy
+            self.strategy = S3Strategy(settings)
+        elif o.scheme == 'gs':
+            from .strategies.gcs import GCSStrategy
+            self.strategy = GCSStrategy(settings)
+        else:
+            raise ValueError('S3PIPELINE_URL must start with s3:// or gs://')
+
         self.items = []
         self.chunk_number = 0
 
@@ -46,8 +47,8 @@ class S3Pipeline:
 
     def process_item(self, item, spider):
         """
-        Process single item. Add item to items and then upload to S3 if size of items
-        >= max_chunk_size.
+        Process single item. Add item to items and then upload to S3/GCS
+        if size of items >= max_chunk_size.
         """
         self._timer_cancel()
 
@@ -78,9 +79,9 @@ class S3Pipeline:
 
     def _upload_chunk(self):
         """
-        Do upload items to S3.
+        Do upload items to S3/GCS.
         """
-        
+
         if not self.items:
             return  # Do nothing when items is empty.
 
@@ -90,8 +91,8 @@ class S3Pipeline:
         object_key = self.object_key_template.format(**self._get_uri_params())
 
         try:
-            self.s3.upload_fileobj(f, self.bucket_name, object_key)
-        except ClientError:
+            self.strategy.upload_fileobj(f, self.bucket_name, object_key)
+        except UploadError:
             self.stats.inc_value('pipeline/s3/fail')
             raise
         else:
@@ -132,14 +133,14 @@ class S3Pipeline:
         bio.seek(0)
 
         return bio
-    
+
     def _timer_start(self):
         """
         Start the timer in s3pipeline
         """
         self._timer = Timer(self.max_wait_upload_time, self._upload_chunk)
         self._timer.start()
-    
+
     def _timer_cancel(self):
         """
         Stop the timer in s3pipeline

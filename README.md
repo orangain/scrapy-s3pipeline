@@ -2,9 +2,9 @@
 
 [![PyPI version](https://badge.fury.io/py/scrapy-s3pipeline.svg)](https://badge.fury.io/py/scrapy-s3pipeline)
 
-Scrapy pipeline to store items into S3 bucket with JSONLines format. Unlike built-in [FeedExporter](https://docs.scrapy.org/en/latest/topics/feed-exports.html#s3), the pipeline has the following features:
+Scrapy pipeline to store items into [Amazon S3](https://aws.amazon.com/s3/) or [Google Cloud Storage (GCS)](https://cloud.google.com/storage) bucket with JSONLines format. Unlike built-in [FeedExporter](https://docs.scrapy.org/en/latest/topics/feed-exports.html#s3), the pipeline has the following features:
 
-* The pipeline upload items to S3 by chunk while crawler is running.
+* The pipeline upload items to S3/GCS by chunk while crawler is running.
 * Support GZip compression.
 
 The pipeline aims to run crawler and scraper in different processes, e.g. run crawler process with Scrapy in AWS Fargate and run scraper process with lxml in AWS Lambda.
@@ -13,12 +13,20 @@ The pipeline aims to run crawler and scraper in different processes, e.g. run cr
 
 * Python 3.6+ (Tested in 3.9)
 * Scrapy 1.1+ (Tested in 2.4)
-* boto3
+* boto3 or google-cloud-storage
 
 ## Install
 
+**For S3 users:**
+
 ```shell-session
-$ pip3 install scrapy-s3pipeline
+$ pip3 install scrapy-s3pipeline[s3]
+```
+
+**For GCS users:**
+
+```shell-session
+$ pip3 install scrapy-s3pipeline[gcs]
 ```
 
 ## Getting started
@@ -26,7 +34,13 @@ $ pip3 install scrapy-s3pipeline
 1. Install Scrapy S3 Pipeline with pip.
 
     ```shell-session
-    $ pip3 install scrapy-s3pipeline
+    $ pip3 install scrapy-s3pipeline[s3]
+    ```
+
+    or
+
+    ```shell-session
+    $ pip3 install scrapy-s3pipeline[gcs]
     ```
 
 2.  Add `'s3pipeline.S3Pipeline'` to `ITEM_PIPELINES` setting in your Scrapy project.
@@ -40,10 +54,23 @@ $ pip3 install scrapy-s3pipeline
 3. Add `S3PIPELINE_URL` setting. You need to change `my-bucket` to your bucket name.
 
     ```py
+    # For S3 users
     S3PIPELINE_URL = 's3://my-bucket/{name}/{time}/items.{chunk:07d}.jl.gz'
+
+    # For GCS users
+    S3PIPELINE_URL = 'gs://my-bucket/{name}/{time}/items.{chunk:07d}.jl.gz'
+    GCS_PROJECT_ID = 'my-project' # Change to your project id
     ```
 
-4. Setup AWS credentials via AWS CLI's `aws configure` command. Alternatively, use Scrapy's `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` settings.
+4. Setup AWS/GCP credentials.
+
+    **For S3 users:**
+
+    Setup AWS credentials via `aws configure` command or [environment variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html). Alternatively, use Scrapy's settings [AWS_ACCESS_KEY_ID](https://docs.scrapy.org/en/latest/topics/settings.html#aws-access-key-id) and [AWS_SECRET_ACCESS_KEY](https://docs.scrapy.org/en/latest/topics/settings.html#aws-secret-access-key).
+
+    **For GCS users:**
+
+    Setup GCP credentials via `gcloud auth application-default login` command or environment variable [GOOGLE_APPLICATION_CREDENTIALS](https://cloud.google.com/docs/authentication/getting-started). Alternatively, you can set json string of service account's key file to `GOOGLE_APPLICATION_CREDENTIALS_JSON` settings.
 
 5. Run your spider. You will see items in your bucket after 100 items are crawled or the spider is closed.
 
@@ -51,9 +78,12 @@ $ pip3 install scrapy-s3pipeline
 
 ### S3PIPELINE_URL (Required)
 
-S3 Bucket URL to store items.
+S3/GCS Bucket URL to store items.
 
-e.g.: `s3://my-bucket/{name}/{time}/items.{chunk:07d}.jl.gz`
+e.g.:
+
+* S3: `s3://my-bucket/{name}/{time}/items.{chunk:07d}.jl.gz`
+* GCS: `gs://my-bucket/{name}/{time}/items.{chunk:07d}.jl.gz`
 
 The following replacement fields are supported in `S3PIPELINE_URL`.
 
