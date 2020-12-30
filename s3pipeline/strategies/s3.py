@@ -5,7 +5,7 @@ from . import UploadError
 
 class S3Strategy:
     def __init__(self, settings):
-        self.s3 = boto3.client(
+        self.client = boto3.client(
             's3',
             region_name=settings['AWS_REGION_NAME'], use_ssl=settings['AWS_USE_SSL'],
             verify=settings['AWS_VERIFY'], endpoint_url=settings['AWS_ENDPOINT_URL'],
@@ -14,7 +14,7 @@ class S3Strategy:
 
     def upload_fileobj(self, f, bucket_name, object_key):
         try:
-            self.s3.upload_fileobj(f, bucket_name, object_key)
+            self.client.upload_fileobj(f, bucket_name, object_key)
         except ClientError as ex:
             raise UploadError(ex)
 
