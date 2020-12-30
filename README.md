@@ -1,6 +1,6 @@
 # Scrapy S3 Pipeline
 
-[![PyPI version](https://badge.fury.io/py/scrapy-s3pipeline.svg)](https://badge.fury.io/py/scrapy-s3pipeline)
+[![PyPI version](https://badge.fury.io/py/scrapy-s3pipeline.svg)](https://badge.fury.io/py/scrapy-s3pipeline) ![CI](https://github.com/orangain/scrapy-s3pipeline/workflows/CI/badge.svg)
 
 Scrapy pipeline to store items into [Amazon S3](https://aws.amazon.com/s3/) or [Google Cloud Storage (GCS)](https://cloud.google.com/storage) bucket with JSONLines format. Unlike built-in [FeedExporter](https://docs.scrapy.org/en/latest/topics/feed-exports.html#s3), the pipeline has the following features:
 
