@@ -3,8 +3,9 @@ from urllib.parse import urlparse
 from datetime import datetime
 import gzip
 from threading import Timer
+import os.path
 
-from scrapy.exporters import JsonLinesItemExporter
+from scrapy.utils.misc import load_object
 
 from s3pipeline.strategies.error import UploadError
 
@@ -28,6 +29,11 @@ class S3Pipeline:
         self.max_chunk_size = settings.getint('S3PIPELINE_MAX_CHUNK_SIZE', 100)
         self.use_gzip = settings.getbool('S3PIPELINE_GZIP', url.endswith('.gz'))
         self.max_wait_upload_time = settings.getfloat('S3PIPELINE_MAX_WAIT_UPLOAD_TIME', 30.0)
+
+        uncompressed_url = url[:-3] if url.endswith('.gz') else url
+        _, ext = os.path.splitext(uncompressed_url)
+        feed_exporter_key = ext[1:].lower()
+        self.exporter_cls = load_object(settings.getwithbase('FEED_EXPORTERS').get(feed_exporter_key, 'scrapy.exporters.JsonLinesItemExporter'))
 
         if o.scheme == 's3':
             from .strategies.s3 import S3Strategy
@@ -120,7 +126,7 @@ class S3Pipeline:
         f = gzip.GzipFile(mode='wb', fileobj=bio) if self.use_gzip else bio
 
         # Build file object using ItemExporter
-        exporter = JsonLinesItemExporter(f, encoding='utf-8')
+        exporter = self.exporter_cls(f, encoding='utf-8')
         exporter.start_exporting()
         for item in self.items:
             exporter.export_item(item)

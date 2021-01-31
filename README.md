@@ -2,9 +2,10 @@
 
 [![PyPI version](https://badge.fury.io/py/scrapy-s3pipeline.svg)](https://badge.fury.io/py/scrapy-s3pipeline) ![CI](https://github.com/orangain/scrapy-s3pipeline/workflows/CI/badge.svg)
 
-Scrapy pipeline to store items into [Amazon S3](https://aws.amazon.com/s3/) or [Google Cloud Storage (GCS)](https://cloud.google.com/storage) bucket with JSONLines format. Unlike built-in [FeedExporter](https://docs.scrapy.org/en/latest/topics/feed-exports.html#s3), the pipeline has the following features:
+Scrapy pipeline to store items into [Amazon S3](https://aws.amazon.com/s3/) or [Google Cloud Storage (GCS)](https://cloud.google.com/storage) bucket. Unlike built-in [FeedExporter](https://docs.scrapy.org/en/latest/topics/feed-exports.html#s3), the pipeline has the following features:
 
 * The pipeline upload items to S3/GCS by chunk while crawler is running.
+  * From Scrapy 2.3, built-in [FEED_EXPORT_BATCH_ITEM_COUNT](https://docs.scrapy.org/en/latest/topics/feed-exports.html#std-setting-FEED_EXPORT_BATCH_ITEM_COUNT) does almost the same thing.
 * Support GZip compression.
 
 The pipeline aims to run crawler and scraper in different processes, e.g. run crawler process with Scrapy in AWS Fargate and run scraper process with lxml in AWS Lambda.
@@ -91,6 +92,8 @@ The following replacement fields are supported in `S3PIPELINE_URL`.
 * `{time}` - gets replaced by a timestamp when the spider is started.
 
 You can also use other spider fields, e.g. `{name}`. You can use [format string syntax](https://docs.python.org/3/library/string.html#formatstrings) here, e.g. `{chunk:07d}`.
+
+File format is determined by a file extension in the URL. For example, if `S3PIPELINE_URL` ends with `.json` or `.json.gz`, JSON format is used. See Scrapy's built-in [FEED_EXPORTERS](https://docs.scrapy.org/en/latest/topics/feed-exports.html#std-setting-FEED_EXPORTERS) settings for supported formats. If the file extension is not available in `FEED_EXPORTERS`, JSONLines format is used by default.
 
 ### S3PIPELINE_MAX_CHUNK_SIZE (Optional)
 
