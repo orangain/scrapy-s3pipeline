@@ -93,7 +93,7 @@ The following replacement fields are supported in `S3PIPELINE_URL`.
 
 You can also use other spider fields, e.g. `{name}`. You can use [format string syntax](https://docs.python.org/3/library/string.html#formatstrings) here, e.g. `{chunk:07d}`.
 
-File format is determined by a file extension in the URL. For example, if `S3PIPELINE_URL` ends with `.json` or `.json.gz`, JSON format is used. See Scrapy's built-in [FEED_EXPORTERS](https://docs.scrapy.org/en/latest/topics/feed-exports.html#std-setting-FEED_EXPORTERS) settings for supported formats.
+File format is determined by a file extension in the URL. For example, if `S3PIPELINE_URL` ends with `.json` or `.json.gz`, JSON format is used. See Scrapy's built-in [FEED_EXPORTERS](https://docs.scrapy.org/en/latest/topics/feed-exports.html#std-setting-FEED_EXPORTERS) settings for supported formats. If the file extension is not available in `FEED_EXPORTERS`, JSONLines format is used by default.
 
 ### S3PIPELINE_MAX_CHUNK_SIZE (Optional)
 
