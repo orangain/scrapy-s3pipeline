@@ -5,6 +5,7 @@
 Scrapy pipeline to store items into [Amazon S3](https://aws.amazon.com/s3/) or [Google Cloud Storage (GCS)](https://cloud.google.com/storage) bucket. Unlike built-in [FeedExporter](https://docs.scrapy.org/en/latest/topics/feed-exports.html#s3), the pipeline has the following features:
 
 * The pipeline upload items to S3/GCS by chunk while crawler is running.
+  * From Scrapy 2.3, built-in [FEED_EXPORT_BATCH_ITEM_COUNT](https://docs.scrapy.org/en/latest/topics/feed-exports.html#std-setting-FEED_EXPORT_BATCH_ITEM_COUNT) does almost the same thing.
 * Support GZip compression.
 
 The pipeline aims to run crawler and scraper in different processes, e.g. run crawler process with Scrapy in AWS Fargate and run scraper process with lxml in AWS Lambda.
